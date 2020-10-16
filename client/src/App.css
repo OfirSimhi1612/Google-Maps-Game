@@ -2,32 +2,47 @@
     z-index: 2;
     position: fixed;
     top: 20px;
-    left: 20px;
+    right: 20px;
+}
+
+.hintButton{
+    z-index: 2;
+    position: fixed;
+    top: 20px;
+    right: 140px;
 }
 
 .gameStatistics{
     position: fixed;
     z-index: 2;
     font-size: 20px;
-    right: 10px;
+    left: 10px;
     top:10px;
     background-color: rgb(68, 138, 77, 0.8);
     width: 15vw;
-    height: 23vh;
+    height: 75px;
     border: 2px solid rgb(97, 40, 2);
+    border-radius: 3%;
     box-shadow: 2px 0px 2px 2px black ;
+    font-weight: bolder;
+    font-size: 23px;
+    padding-left: 10px;
 }
 
 .missingCity{
     position: fixed;
     z-index: 2;
-    font-size: 20px;
+    font-size: 23px;
     margin-left: auto;
     margin-right: auto;
     background-color: rgb(68, 138, 77, 0.8);
-    width: 10vw;
+    border-radius: 3%;
+    width: 20vw;
     height: 40px;
-    top: 10px;
-    left: 45vw;
+    top: 20px;
+    left: 40vw;
     border: 2px solid rgb(97, 40, 2);
+    box-shadow: 2px 0px 2px 2px black ;
+    text-align: center;
+    font-weight: bolder;
 }

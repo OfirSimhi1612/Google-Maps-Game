@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import './App.css';
 import Map from './Maps/map'
 import IntroModal from './Modals/IntroModal'
-import { getCities, getRandomCity, getAbsuluteDistance } from './Game/GameManager'
+import { getCities, getRandomCity, getAbsuluteDistance, getHintCordinates } from './Game/GameManager'
 import MoveEndModal from './Modals/MoveEndModal';
 import EndGameModal from './Modals/EndGameModal'
 
@@ -15,8 +15,14 @@ import EndGameModal from './Modals/EndGameModal'
 function App() {
 
   const [modalsControl, setModalsControl] = useState({Intro: false, MoveEnd: false})
-  const [gameSettings, setGameSettings] = useState({})
-  const [mapState, setMapState] = useState({})
+  const [gameSettings, setGameSettings] = useState({
+      config: {
+        mapType: ['roadmap', 'Road Map'],
+        roads: [true, true, 'Roads and numbers'],
+        cities: ['large', 'Large Cities Only']
+      }
+  })
+  const [mapState, setMapState] = useState({zoom: 8})
   const [cities, setCities] = useState({ all: [], missing: []})
   const [gameMoves, setGameMoves] = useState({movesStatistics: []})
 
@@ -28,11 +34,13 @@ function App() {
   , 1000)
   }, [])
 
-  function startGame(level){
+
+  function startGame(config){
     setGameSettings({
-      level,
-      mapLevel: level,
-      started: true
+      config: {
+        ...config
+      },
+      started: true,
     })
 
     setModalsControl({
@@ -40,7 +48,7 @@ function App() {
       Intro: false
     })
 
-    const citiesByLevel = getCities(level)
+    const citiesByLevel = getCities(config.cities[0])
     const missingCities = [];
 
     for(let i=0; i < 10; i++){
@@ -64,7 +72,13 @@ function App() {
 
   function endGame(){
     setModalsControl({...modalsControl, EndGame: false,  Intro: true})
-    setGameSettings({})
+    setGameSettings({
+      config: {
+        mapType: ['roadmap', 'Road Map'],
+        roads: [true, true, 'Roads and numbers'],
+        cities: ['large', 'Large Cities Only']
+      }
+    })
     setCities({})
     setMapState({})
   }
@@ -78,7 +92,8 @@ function App() {
       missingCity: {
         lat: gameSettings.started ? cities.missing[gameMoves.move - 1].Y : null,
         lng: gameSettings.started ? cities.missing[gameMoves.move - 1].X : null
-      }
+      },
+      zoom: 9
     })
 
     if(gameSettings.started){
@@ -102,7 +117,7 @@ function App() {
         setTimeout(() => setModalsControl({
           ...modalsControl,
           MoveEnd: true
-        }) ,500) 
+        }) ,1500) 
       } else {
         setModalsControl({
           ...modalsControl,
@@ -125,6 +140,22 @@ function App() {
     })
 
     setMapState({})
+  }
+
+  function getHint(){
+
+    const hintCordenates = getHintCordinates(cities.missing[gameMoves.move - 1].Y, cities.missing[gameMoves.move - 1].X)
+    
+    setMapState({
+      ...mapState,
+      hint: hintCordenates,
+      zoom: 9
+    })
+
+    setTimeout(() => {
+      setMapState({
+      })
+    }, 3000)
   }
 
   return (
@@ -160,20 +191,23 @@ function App() {
             {cities.missing[gameMoves.move - 1].MGLSDE_LOC}
         </div>
         <div className='gameStatistics'>
-                <div className='movesDiv'>{gameMoves.move}/10</div>
-                <div className='pointsDiv'>{gameMoves.points}</div>
+                <div className='movesDiv'>Moves: {gameMoves.move}/10</div>
+                <div className='pointsDiv'>Points: {gameMoves.points}</div>
         </div>
       </>
       }
       <Map 
-        // config={gameSettings.config}
-        config={gameSettings}
+        config={gameSettings.config}
         mapState={mapState}
         handleMove={handleMove}
+        zoom={mapState.zoom}
       />
       {(!modalsControl.Intro && !gameSettings.started) ? 
-      <Button className='startNewGameButton' variant='success' onClick={() => setModalsControl({...modalsControl, Intro: true})}>משחק חדש</Button>
-      : <Button className='startNewGameButton' variant='danger' onClick={endGame}>סיים משחק</Button>
+      <Button className='startNewGameButton' variant='success' onClick={() => setModalsControl({...modalsControl, Intro: true})}>New Game</Button>
+      : <>
+          <Button className='startNewGameButton' variant='danger' onClick={endGame}>End Game</Button>          
+          <Button className='hintButton' variant='warning' onClick={getHint}>Hint!</Button>
+        </>
 
     }
    </>

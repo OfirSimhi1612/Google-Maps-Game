@@ -1,9 +1,22 @@
 import allCities from '../Maps/cities'
-import Levels from'../Configs/Levels'
 
-export function getCities(level){
+export function getCities(size){
 
-    const filteredCities = allCities.filter(city => city.MGLSDE_L_1 > Levels[level - 1].populationLimit)
+    let popLimit = 0;
+
+    switch (size) {
+        case 'large':
+            popLimit = 25000
+            break;
+        case 'mediume':
+            popLimit = 10000
+            break;
+        case 'small':
+            popLimit = 0
+            break;
+    }
+
+    const filteredCities = allCities.filter(city => city.MGLSDE_L_1 > popLimit)
     
     return filteredCities;
 }
@@ -37,3 +50,14 @@ export function getAbsuluteDistance(lat1,lon1,lat2,lon2) {
 
 //  }
 
+export function getHintCordinates(lat, lng){
+
+    const yDiff = Math.random() / 3 * (Math.random() > 0.5 ? -1 : 1)
+    const xDiff = Math.random() / 3 * (Math.random() > 0.5 ? -1 : 1)
+    
+    return {
+        lat: lat + yDiff,
+        lng: lng + xDiff
+    }
+    
+}
