@@ -26,6 +26,7 @@ function App() {
   const [cities, setCities] = useState({ all: [], missing: []})
   const [gameMoves, setGameMoves] = useState({movesStatistics: []})
 
+  
   useEffect(() => {
     setTimeout(() => setModalsControl({
       ...modalsControl,
@@ -155,7 +156,7 @@ function App() {
     setTimeout(() => {
       setMapState({
       })
-    }, 3000)
+    }, 5000)
   }
 
   return (

@@ -20,6 +20,7 @@
     top:10px;
     background-color: rgb(68, 138, 77, 0.8);
     width: 15vw;
+    min-width: 160px;
     height: 75px;
     border: 2px solid rgb(97, 40, 2);
     border-radius: 3%;
