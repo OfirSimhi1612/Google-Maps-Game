@@ -15,14 +15,16 @@ function MoveEndModal(props){
             centered
         >
             <Modal.Header className='ModalHeaderContainer'>
-                <h1 className='ModalHeader'>Game Over!</h1>
+                <Modal.Title id="contained-modal-title-vcenter">
+                    <h1 className='ModalHeader'>Game Over!</h1>
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <div>You guessed {props.correct} correct point out of 10 (less than 6 km from the point),</div>
-                <div>and earned {props.points} points!</div>
+                <div>You guessed <b>{props.correct}</b> correct locations out of 10,</div>
+                <div>and earned <b>{props.points}</b> points!</div>
                 {/* <SuccessChart></SuccessChart> */}
                 <div>Good Job!</div>
-                <Button variant='outline-success' onClick={props.newGame}>New Game</Button>
+                <Button className='startGameInLevel' variant='outline-success' onClick={props.newGame}>New Game</Button>
             </Modal.Body>
         </Modal>
         </>

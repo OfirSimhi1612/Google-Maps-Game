@@ -2,12 +2,6 @@
     background-color: rgba(195, 197, 197, 0.8) !important;
 }
 
-.LevelsSlider{
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 #contained-modal-title-vcenter{
     margin-left: auto;
     margin-right: auto;
@@ -24,5 +18,61 @@
 .startGameInLevel{
     margin-right: auto;
     margin-left: auto;
-    width: 70px;
+    width: 200px;
+    margin-top: 20px;
+}
+
+.configKeyDiv{
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    width: 350px;
+    align-self: center;
+    font-size: larger;
+}
+
+#mapType-dropdown-basic{
+    color: black
+}
+
+#roads-dropdown-basic{
+    color: black;
+}
+
+#cities-dropdown-basic{
+    color: black;
+}
+
+.mapConfig{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+}
+
+.dropDowns{
+    margin-left: auto;
+}
+
+.configTitle{
+    margin-bottom: 20px;
+}
+
+.modal-dialog{
+    width: 600px !important;
+}
+
+.modal-header{
+    align-items: center !important;
+}
+
+.modal-body{
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nextMoveButton{
+    margin-top: 20px;
 }

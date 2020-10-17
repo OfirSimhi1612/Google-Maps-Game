@@ -1,120 +1,116 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { GoogleMap, LoadScript, Marker, Circle } from '@react-google-maps/api';
-import MapsLevels from '../Configs/MapConfigs/MapsLevels'
 import './map.css'
 
-function MapContainer({mapState, config, handleMove, missingCity}) {
+function MapContainer({mapState, config, handleMove}) {
 
   const [center, setCenter] = useState()
 
   const map = useRef()
-  const mapsLevels = MapsLevels
 
   const mapStyles = {        
     height: "100vh",
     width: "100%"
   }
 
-//  const mapConfig = [
-//   {
-//     "featureType": "administrative",
-//     "elementType": "labels",
-//     "stylers": [
-//         {
-//             "visibility": "off"
-//         }
-//     ]
-//   },
-//   {
-//       "featureType": "administrative",
-//       "elementType": "labels",
-//       "stylers": [
-//           {
-//               "visibility": "off"
-//           }
-//       ]
-//   },
-//   {
-//       "featureType": "landscape",
-//       "elementType": "labels",
-//       "stylers": [
-//           {
-//               "visibility": "off"
-//           }
-//       ]
-//   },
-//   {
-//       "featureType": "landscape.man_made",
-//       "elementType": "all",
-//       "stylers": [
-//           {
-//               "saturation": "-70"
-//           },
-//           {
-//               "lightness": "14"
-//           }
-//       ]
-//   },
-//   {
-//       "featureType": "poi",
-//       "elementType": "labels",
-//       "stylers": [
-//           {
-//               "visibility": "off"
-//           }
-//       ]
-//   },
-//   {
-//       "featureType": "road",
-//       "elementType": "labels",
-//       "stylers": [
-//           {
-//               "visibility": config.roadNumbers
-//           }
-//       ]
-//   },
-//   {
-//     "featureType": "road",
-//     "elementType": "all",
-//     "stylers": [
-//         {
-//             "visibility": config.roads
-//         }
-//     ]
-//   },
-//   {
-//       "featureType": "transit",
-//       "elementType": "labels",
-//       "stylers": [
-//           {
-//               "visibility": "off"
-//           }
-//       ]
-//   },
-//   {
-//       "featureType": "water",
-//       "elementType": "all",
-//       "stylers": [
-//           {
-//               "saturation": "100"
-//           },
-//           {
-//               "lightness": "-14"
-//           }
-//       ]
-//   },
-//   {
-//       "featureType": "water",
-//       "elementType": "labels",
-//       "stylers": [
-//           {
-//               "visibility": "off"
-//           },
-//           {
-//               "lightness": "12"
-//           }
-//       ]
-//   }] 
+  useEffect(() => {
+    if(map.current){
+      map.current.state.map.mapTypeId = config.mapType[0]
+      console.log(map)
+    }
+  }, [config])
+
+ const mapConfig = [
+  {
+      "featureType": "administrative",
+      "elementType": "labels",
+      "stylers": [
+          {
+              "visibility": "off"
+          }
+      ]
+  },
+  {
+      "featureType": "landscape",
+      "elementType": "labels",
+      "stylers": [
+          {
+              "visibility": "off"
+          }
+      ]
+  },
+  {
+      "featureType": "landscape.man_made",
+      "elementType": "all",
+      "stylers": [
+          {
+              "saturation": "-70"
+          },
+          {
+              "lightness": "14"
+          }
+      ]
+  },
+  {
+      "featureType": "poi",
+      "elementType": "labels",
+      "stylers": [
+          {
+              "visibility": "off"
+          }
+      ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "all",
+    "stylers": [
+        {
+            "visibility": config.roads[0] ? 'on' : 'off'
+        }
+    ]
+  },
+  {
+      "featureType": "road",
+      "elementType": "labels",
+      "stylers": [
+          {
+              "visibility": config.roads[1] ? 'on' : 'off'
+          }
+      ]
+  },
+  {
+      "featureType": "transit",
+      "elementType": "labels",
+      "stylers": [
+          {
+              "visibility": "off"
+          }
+      ]
+  },
+  {
+      "featureType": "water",
+      "elementType": "all",
+      "stylers": [
+          {
+              "saturation": "100"
+          },
+          {
+              "lightness": "-14"
+          }
+      ]
+  },
+  {
+      "featureType": "water",
+      "elementType": "labels",
+      "stylers": [
+          {
+              "visibility": "off"
+          },
+          {
+              "lightness": "12"
+          }
+      ]
+  }] 
 
   function changeCenter(){
     if(map.current){
@@ -126,10 +122,11 @@ function MapContainer({mapState, config, handleMove, missingCity}) {
     
   }
 
+
   const options = {
-    styles: mapsLevels[config.mapLevel - 1],
+    styles: mapConfig,
     disableDefaultUI: true,
-    zoomControl: true
+    zoomControl: true,          
   }
   
   return (
@@ -140,7 +137,7 @@ function MapContainer({mapState, config, handleMove, missingCity}) {
           ref={map}
           mapContainerStyle={mapStyles}
           options={options}
-          zoom={7}
+          zoom={mapState.zoom}
           center={center ? { lat: center.lat, lng: center.lng } : {lat: 32, lng: 35}}
           onClick={handleMove}
           onDragEnd={changeCenter}
@@ -158,6 +155,13 @@ function MapContainer({mapState, config, handleMove, missingCity}) {
             <Circle 
               radius={6000}
               center={mapState.missingCity}
+            />
+          }
+
+          {mapState.hint &&
+            <Circle 
+              radius={40000}
+              center={mapState.hint}
             />
           }
 

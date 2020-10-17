@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import './Modals.css'
-import Slider from 'react-slick';
-import Levels from '../Configs/Levels'
 import Button from 'react-bootstrap/Button'
-import { StreetViewService } from '@react-google-maps/api';
+import Dropdown from 'react-bootstrap/Dropdown'
 
 
 
@@ -12,24 +10,18 @@ import { StreetViewService } from '@react-google-maps/api';
 function IntroModal(props){
 
     const [config, setConfig] = useState({
-        mapType: 'Map',
-        borders: true,
-        roads: true,
-        roadsNumbers: true,
-        streets: true,
-        cities: 'large'
+        mapType: ['roadmap', 'Road Map'],
+        roads: [true, true, 'Roads and numbers'],
+        cities: ['large', 'Large Cities Only']
     })
 
-    
-    const SliderSettings = {
-        className: "center",
-        infinite: true,
-        centerPadding: "60px",
-        slidesToShow: 1,
-        speed: 500,
-    };
-
-
+    function updateConfig(key, value){
+        setConfig({
+            ...config,
+            [key]: value
+        })
+        console.log(config)
+    }
 
     return(
         <>
@@ -45,45 +37,51 @@ function IntroModal(props){
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-
-                <div className='LevelsSlider'>
-                    <Slider {...SliderSettings} className='levelsSlider'>
-                        {Levels.map(level => {
-                            return (
-                                <div className='levelSlide'>
-                                    <h2>Level {level.level}</h2>
-                                    <p>{level.discription}</p>
-                                    <Button className='startGameInLevel' variant='success' onClick={() => props.start_game(level.level)}>Start!</Button>
-                                </div>
-                            );
-                        })
-                        }
-                    </Slider>
-                    {/* <div className='mapConfig'>
-                        <div className='mapTypeConfig'>
-                            <select className='mapTypeSelect'>
-                                <option selected value='roadmap'>Map (without terrain)</option>
-                                <option value='terrain'>Terrain</option>
-                                <option value='hybrid'>Hybrid</option>
-                                <option value='sattelite'>Sattelite</option>
-                            </select>
-                        </div> */}
-                        {/* <Dropdown>
-                            <Dropdown.Toggle variant="outlined-success" id="mapType-dropdown-basic">
-                                
+                <div className='mapConfig'>
+                <h3 className='configTitle'>Choose Game Configuration: </h3>
+                    <div className='configKeyDiv'>
+                        <label className='mapTypeLabel'>Map Type: </label>
+                        <Dropdown className='dropDowns'>
+                            <Dropdown.Toggle variant="outline-info" id="mapType-dropdown-basic">
+                                { config.mapType[1]}
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>
-                                <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                                <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                                <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('mapType', ['roadmap', 'Road Map'])}>Road Map</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('mapType', ['hybrid', 'Satellite'])}>Satellite</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('mapType', ['terrain', 'Terrain'])}>Terrain</Dropdown.Item>
                             </Dropdown.Menu>
-                        </Dropdown> */}
-                    {/* </div>
-                    <div className='citiesConfig'>
-
+                        </Dropdown >
                     </div>
-                    <Button className='startGameInLevel' variant='success' onClick={() => props.start_game(1)}>Start!</Button> */}
+                    <div className='configKeyDiv'>
+                        <label className='raodsLabel'>Roads Display: </label>
+                        <Dropdown className='dropDowns'>
+                            <Dropdown.Toggle variant="outline-info" id="roads-dropdown-basic">
+                                { config.roads[2]}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                <Dropdown.Item onSelect={() => updateConfig('roads', [true, true, 'Roads And Numbers'])}>Roads And Numbers</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('roads', [true, false, 'Only Roads'])}>Only Roads</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('roads', [false, false, 'No Roads'])}>No Roads</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </div>
+                    <div className='configKeyDiv'>
+                        <label className='citiesLabel'>Cities: </label>
+                        <Dropdown className='dropDowns'>
+                            <Dropdown.Toggle variant="outline-info" id="cities-dropdown-basic">
+                                { config.cities[1]}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                <Dropdown.Item onSelect={() => updateConfig('cities', ['large', 'Large Cities Only'])}>Large Cities Only</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('cities', ['mediume', 'Large And Medium Cities'])}>Large And Medium Cities</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('cities', ['small', 'All Cities'])}>All Cities</Dropdown.Item>
+                            </Dropdown.Menu>
+                            </Dropdown>
+                    </div>                  
+                    <Button className='startGameInLevel' variant='success' onClick={() => props.start_game(config)}>Start!</Button>
                 </div>
             </Modal.Body>
         </Modal>
