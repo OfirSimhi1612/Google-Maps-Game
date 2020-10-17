@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { GoogleMap, LoadScript, Marker, Circle } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, Circle, MarkerClusterer } from '@react-google-maps/api';
 import './map.css'
+
 
 function MapContainer({mapState, config, handleMove}) {
 
@@ -16,11 +17,12 @@ function MapContainer({mapState, config, handleMove}) {
   useEffect(() => {
     if(map.current){
       map.current.state.map.mapTypeId = config.mapType[0]
-      console.log(map)
     }
   }, [config])
 
- const mapConfig = [
+  const playersColors = ['red', 'blue', 'green']
+
+  const mapConfig = [
   {
       "featureType": "administrative",
       "elementType": "labels",
@@ -144,18 +146,28 @@ function MapContainer({mapState, config, handleMove}) {
           onZoomChanged={changeCenter}
         >
           {mapState.marker &&
-            <Marker 
-            position={{lat: mapState.marker.lat, lng: mapState.marker.lng }}
-            draggable
-            onDragEnd={handleMove}
-            />
+            mapState.marker.map((marker, index) => {
+              return <Marker 
+              position={{lat: marker.lat, lng: marker.lng }}
+              icon={{
+                  url:  `http://maps.google.com/mapfiles/ms/icons/${playersColors[index]}-dot.png`
+                }}
+              />
+            })
+            
           }
 
           {mapState.missingCity &&
-            <Circle 
-              radius={6000}
-              center={mapState.missingCity}
-            />
+          mapState.missingCity.map((circle, index) => {
+            return <Circle 
+            radius={6000}
+            center={circle}
+            options={{
+              strokeColor: playersColors[index]
+            }}
+          />
+          })
+            
           }
 
           {mapState.hint &&
