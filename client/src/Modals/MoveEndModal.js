@@ -6,7 +6,7 @@ import './Modals.css'
 
 function MoveEndModal(props){
 
-    console.log(props)
+    
     return(
         <>
         <Modal

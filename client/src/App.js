@@ -3,13 +3,12 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Button from 'react-bootstrap/Button';
 import './App.css';
-import Map from './Maps/map'
+import Map from './Maps/Map'
 import IntroModal from './Modals/IntroModal'
-import { getCities, getRandomCity, getAbsuluteDistance, getHintCordinates } from './Game/GameManager'
+import { getCities, getRandomCity, getAbsuluteDistance, getHintCordinates, getPolylinePath } from './Game/GameManager'
 import MoveEndModal from './Modals/MoveEndModal';
 import EndGameModal from './Modals/EndGameModal'
-
-
+import swal from 'sweetalert'
 
 
 function App() {
@@ -17,12 +16,13 @@ function App() {
   const [modalsControl, setModalsControl] = useState({Intro: false, MoveEnd: false})
   const [gameSettings, setGameSettings] = useState({
       config: {
+        gameType: ['air', 'Air Distance'],
         mapType: ['roadmap', 'Road Map'],
         roads: [true, true, 'Roads and numbers'],
         cities: ['large', 'Large Cities Only']
       }
   })
-  const [mapState, setMapState] = useState({zoom: 8})
+  const [mapState, setMapState] = useState({zoom: 8, polyline: []})
   const [cities, setCities] = useState({ all: [], missing: []})
   const [gameMoves, setGameMoves] = useState({movesStatistics: []})
 
@@ -57,7 +57,7 @@ function App() {
 
     let missingCities = [];
 
-    for(let j = 0; j < config.gameType[0]; j++){
+    for(let j = 0; j < config.participants[0]; j++){
 
       missingCities[j] = [];
 
@@ -74,7 +74,7 @@ function App() {
 
     const points = []
 
-    for(let i =0; i < config.gameType[0]; i++){
+    for(let i =0; i < config.participants[0]; i++){
       points.push(0)
     }
 
@@ -87,7 +87,8 @@ function App() {
 
     setMapState({
       marker: [],
-      missingCity: []
+      missingCity: [],
+      polyline: []
     })
   }
 
@@ -95,16 +96,17 @@ function App() {
     setModalsControl({...modalsControl, EndGame: false,  Intro: true})
     setGameSettings({
       config: {
+        gameType: ['air', 'Air Distance'],
         mapType: ['roadmap', 'Road Map'],
         roads: [true, true, 'Roads and numbers'],
         cities: ['large', 'Large Cities Only']
       }
     })
     setCities({})
-    setMapState({})
+    setMapState({zoom: 8, polyline: []})
   }
 
-  function handleMove(event){
+  async function handleMove(event){
 
     const player = gameMoves.turn - 1;
     const move = gameMoves.move - 1;
@@ -122,11 +124,38 @@ function App() {
       lng: gameSettings.started ? cities.missing[player][move].X : null
     }
 
-    setMapState({
-      marker: markers,
-      missingCity: missing,
-      zoom: 8
-    })
+    if(gameSettings.config.gameType[0] === 'air'){
+
+      setMapState({
+        ...mapState,
+        marker: markers,
+        missingCity: missing,
+        zoom: 8
+      })
+    } else {
+
+      const polyPath = await getPolylinePath(markers[player], missing[player])
+
+      if(polyPath === 'error'){
+        swal({
+          text: 'Invalid Place! \nPick another one...',
+          icon: "error",
+          button: "ok",
+      })
+        return 
+      }
+      const polyline = [...mapState.polyline]
+
+      polyline.push(polyPath)
+
+
+      setMapState({
+        marker: markers,
+        missingCity: missing,
+        polyline: polyline,
+        zoom: 8
+      })
+    }
 
     if(gameSettings.started){
 
@@ -146,7 +175,7 @@ function App() {
       })
 
       
-      if(player + 1 === gameSettings.config.gameType[0]){
+      if(player + 1 === gameSettings.config.participants[0]){
 
         setGameMoves({
           ...gameMoves,
@@ -154,7 +183,7 @@ function App() {
           points: points,
         })
 
-        if(gameMoves.move < 10 || gameMoves.turn < gameSettings.config.gameType[0]){
+        if(gameMoves.move < 10 || gameMoves.turn < gameSettings.config.participants[0]){
           
           setTimeout(() => setModalsControl({
             ...modalsControl,
@@ -192,13 +221,14 @@ function App() {
 
     setMapState({
       marker: [],
-      missingCity: []
+      missingCity: [],
+      polyline: []
     })
   }
 
   function getHint(){
 
-    const hintCordenates = getHintCordinates(cities.missing[gameMoves.move - 1].Y, cities.missing[gameMoves.move - 1].X)
+    const hintCordenates = getHintCordinates(cities.missing[gameMoves.turn - 1][gameMoves.move - 1].Y, cities.missing[gameMoves.turn - 1][gameMoves.move - 1].X)
     
     setMapState({
       ...mapState,
@@ -208,6 +238,8 @@ function App() {
 
     setTimeout(() => {
       setMapState({
+        ...mapState,
+        hint: null
       })
     }, 5000)
   }
@@ -246,10 +278,10 @@ function App() {
             {cities.missing[gameMoves.turn - 1][gameMoves.move - 1].MGLSDE_LOC}
         </div>
         <div className='gameStatistics'>
-                {gameSettings.config.gameType > 1 &&<div className='turnDiv'>Turn: Player {gameMoves.turn}</div>}
+                {gameSettings.config.participants > 1 &&<div className='turnDiv'>Turn: Player {gameMoves.turn}</div>}
                 <div className='movesDiv'>Moves: {gameMoves.move}/10</div>
                 <div className='pointsDiv'>
-                  {gameSettings.config.gameType[0] === 1 ?
+                  {gameSettings.config.participants[0] === 1 ?
                     <div>Points: {gameMoves.points[0] ? gameMoves.points[0] : 0}</div>
                     :
                     <div>
@@ -270,6 +302,7 @@ function App() {
       <Map 
         config={gameSettings.config}
         mapState={mapState}
+        gameType={gameSettings.config.gameType[0]}
         handleMove={handleMove}
         zoom={mapState.zoom}
       />

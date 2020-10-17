@@ -1,11 +1,55 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { GoogleMap, LoadScript, Marker, Circle, MarkerClusterer } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, Circle, DirectionsRenderer, DirectionsService, Polyline } from '@react-google-maps/api';
 import './map.css'
+import mapConfig from '../Configs/MapConfig'
+import _Marker from './Marker'
+import _Circle from './Circle'
+import _Polyline from './Polyline'
 
 
-function MapContainer({mapState, config, handleMove}) {
+function Map({mapState, config, handleMove, gameType}) {
 
   const [center, setCenter] = useState()
+  // const [polylines, setPolylines] = useState([])
+
+  // useEffect(() => {
+    
+  //   async function getPoly(){
+       
+  //     const lines = []
+  //     mapState.marker.map(async (player, index) => {
+
+  //       const polyPath = await getPolylinePath(player, mapState.missingCity[index])
+  //       lines.push(polyPath)
+  //     }) 
+
+  //     setPolylines(lines)
+  //   }
+  //   if(mapState.marker && mapState.missingCity && gameType === 'drive'){
+  //     getPoly()
+  //   } else {
+  //     if(polylines.llength > 0){
+  //       setPolylines([])
+  //     } else {
+  //       return
+  //     }
+  //   }
+  // }, [mapState])
+
+  // function getDirections(response){
+  //   if (response !== null) {
+  //     if (response.status === 'OK') {
+  //       const polyPoints = response.routes[0].legs[0].steps.map(step => PolylinePoints(step.polyline.points))
+  //       setPolylines([
+  //         ...polylines,
+  //         polyPoints.flat()
+  //       ])
+  //     } else {
+  //       console.log('response: ', response)
+  //     }
+  //   }
+  // }
+
 
   const map = useRef()
 
@@ -20,100 +64,6 @@ function MapContainer({mapState, config, handleMove}) {
     }
   }, [config])
 
-  const playersColors = ['red', 'blue', 'green']
-
-  const mapConfig = [
-  {
-      "featureType": "administrative",
-      "elementType": "labels",
-      "stylers": [
-          {
-              "visibility": "off"
-          }
-      ]
-  },
-  {
-      "featureType": "landscape",
-      "elementType": "labels",
-      "stylers": [
-          {
-              "visibility": "off"
-          }
-      ]
-  },
-  {
-      "featureType": "landscape.man_made",
-      "elementType": "all",
-      "stylers": [
-          {
-              "saturation": "-70"
-          },
-          {
-              "lightness": "14"
-          }
-      ]
-  },
-  {
-      "featureType": "poi",
-      "elementType": "labels",
-      "stylers": [
-          {
-              "visibility": "off"
-          }
-      ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "all",
-    "stylers": [
-        {
-            "visibility": config.roads[0] ? 'on' : 'off'
-        }
-    ]
-  },
-  {
-      "featureType": "road",
-      "elementType": "labels",
-      "stylers": [
-          {
-              "visibility": config.roads[1] ? 'on' : 'off'
-          }
-      ]
-  },
-  {
-      "featureType": "transit",
-      "elementType": "labels",
-      "stylers": [
-          {
-              "visibility": "off"
-          }
-      ]
-  },
-  {
-      "featureType": "water",
-      "elementType": "all",
-      "stylers": [
-          {
-              "saturation": "100"
-          },
-          {
-              "lightness": "-14"
-          }
-      ]
-  },
-  {
-      "featureType": "water",
-      "elementType": "labels",
-      "stylers": [
-          {
-              "visibility": "off"
-          },
-          {
-              "lightness": "12"
-          }
-      ]
-  }] 
-
   function changeCenter(){
     if(map.current){
       setCenter({
@@ -124,11 +74,10 @@ function MapContainer({mapState, config, handleMove}) {
     
   }
 
-
   const options = {
-    styles: mapConfig,
+    styles: mapConfig(config),
     disableDefaultUI: true,
-    zoomControl: true,          
+    zoomControl: true,           
   }
   
   return (
@@ -145,40 +94,31 @@ function MapContainer({mapState, config, handleMove}) {
           onDragEnd={changeCenter}
           onZoomChanged={changeCenter}
         >
-          {mapState.marker &&
+          {(mapState.marker) &&
             mapState.marker.map((marker, index) => {
-              return <Marker 
-              position={{lat: marker.lat, lng: marker.lng }}
-              icon={{
-                  url:  `http://maps.google.com/mapfiles/ms/icons/${playersColors[index]}-dot.png`
-                }}
-              />
+              return <_Marker marker={marker} index={index}/>
             })
-            
           }
 
-          {mapState.missingCity &&
+          {(mapState.missingCity) &&
           mapState.missingCity.map((circle, index) => {
-            return <Circle 
-            radius={6000}
-            center={circle}
-            options={{
-              strokeColor: playersColors[index]
-            }}
-          />
+            return <_Circle circle={circle} index={index} />
           })
             
           }
 
+          {mapState.polyline.length > 0 && 
+           mapState.polyline.map((poly, index) => {
+           return <_Polyline poly={poly} index={index}/>
+            })
+          }
+
           {mapState.hint &&
-            <Circle 
-              radius={40000}
-              center={mapState.hint}
-            />
+            <Circle radius={40000} center={mapState.hint}/>
           }
 
         </GoogleMap>
      </LoadScript>
   )
 }
-export default MapContainer;
+export default Map;
