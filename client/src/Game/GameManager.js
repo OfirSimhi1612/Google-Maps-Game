@@ -61,3 +61,17 @@ export function getHintCordinates(lat, lng){
     }
     
 }
+
+export function getWalkingDistance(origin, destination){
+
+    const url = new URL('https://maps.googleapis.com/maps/api/directions/json')
+    url.search = new URLSearchParams({
+        origin: '31.857700045996,34.8370833334332',
+        destination: '31.9632730962419,34.9137746940875',
+        key: 'AIzaSyBeOBTkKGGeblhp3ie0RmdDDI6uHduVYVw',
+        mode: 'walking'
+    })
+ 
+    fetch(url).then(res => res.json()).then(res => console.log(res))
+
+}

@@ -48,27 +48,47 @@ function App() {
       ...modalsControl,
       Intro: false
     })
-
+    
     const citiesByLevel = getCities(config.cities[0])
-    const missingCities = [];
 
-    for(let i=0; i < 10; i++){
-      const randomCity = getRandomCity(citiesByLevel)
-      missingCities.push(randomCity)
+    setCities({
+      all: citiesByLevel
+    })
+
+    let missingCities = [];
+
+    for(let j = 0; j < config.gameType[0]; j++){
+
+      missingCities[j] = [];
+
+      for(let i=0; i < 10; i++){
+        const randomCity = getRandomCity(citiesByLevel)
+        missingCities[j].push(randomCity)
+      }
+
     }
 
     setCities({
       missing: missingCities,
-      all: citiesByLevel
     })
+
+    const points = []
+
+    for(let i =0; i < config.gameType[0]; i++){
+      points.push(0)
+    }
 
     setGameMoves({
       move: 1,
-      points: 0,
-      movesStatistics: []
+      points,
+      movesStatistics: [],
+      turn: 1
     })
 
-    setMapState({})
+    setMapState({
+      marker: [],
+      missingCity: []
+    })
   }
 
   function endGame(){
@@ -85,44 +105,73 @@ function App() {
   }
 
   function handleMove(event){
+
+    const player = gameMoves.turn - 1;
+    const move = gameMoves.move - 1;
+
+    const markers = [...mapState.marker] 
+    const missing = [...mapState.missingCity]
+
+    markers[player] = {
+      lat: event.latLng.lat(),
+      lng: event.latLng.lng()
+    }
+
+    missing[player] = {
+      lat: gameSettings.started ? cities.missing[player][move].Y : null,
+      lng: gameSettings.started ? cities.missing[player][move].X : null
+    }
+
     setMapState({
-      marker: {
-        lat: event.latLng.lat(),
-        lng: event.latLng.lng()
-      },
-      missingCity: {
-        lat: gameSettings.started ? cities.missing[gameMoves.move - 1].Y : null,
-        lng: gameSettings.started ? cities.missing[gameMoves.move - 1].X : null
-      },
-      zoom: 9
+      marker: markers,
+      missingCity: missing,
+      zoom: 8
     })
 
     if(gameSettings.started){
 
-      const distance = getAbsuluteDistance(event.latLng.lat(), event.latLng.lng(), cities.missing[gameMoves.move - 1].Y, cities.missing[gameMoves.move - 1].X )
+      const distance = getAbsuluteDistance(event.latLng.lat(), event.latLng.lng(), cities.missing[player][move].Y, cities.missing[player][move].X )
 
-      setGameMoves({
-        ...gameMoves,
-        movesStatistics:[ 
-          ...gameMoves.movesStatistics,
-         {
-            success: distance < 6 ? true : false,
-            distance: distance.toFixed(2),
-            points: distance > 6 ? parseInt(100/distance) : 100
-         }
-        ],
-        points: gameMoves.points + (distance > 6 ? parseInt(100/distance) : 100)
+      const statistics = [...gameMoves.movesStatistics]
+      const points = [...gameMoves.points]
+
+      statistics[player] = statistics[player] ? statistics[player] : [];
+    
+      points[player] = points[player] + (distance > 6 ? parseInt(106 - distance) : 100)
+
+      statistics[player].push({
+          success: distance < 6 ? true : false,
+          distance: distance.toFixed(2),
+          points: distance > 6 ? parseInt(106 - distance) : 100
       })
+
       
-      if(gameMoves.move < 10){
-        setTimeout(() => setModalsControl({
-          ...modalsControl,
-          MoveEnd: true
-        }) ,1500) 
+      if(player + 1 === gameSettings.config.gameType[0]){
+
+        setGameMoves({
+          ...gameMoves,
+          movesStatistics: statistics,
+          points: points,
+        })
+
+        if(gameMoves.move < 10 || gameMoves.turn < gameSettings.config.gameType[0]){
+          
+          setTimeout(() => setModalsControl({
+            ...modalsControl,
+            MoveEnd: true
+          }) ,1000) 
+        } else {
+          setModalsControl({
+            ...modalsControl,
+            EndGame: true
+          })
+        }
       } else {
-        setModalsControl({
-          ...modalsControl,
-          EndGame: true
+        setGameMoves({
+          ...gameMoves,
+          movesStatistics: statistics,
+          points: points,
+          turn: gameMoves.turn + 1
         })
       }
     }
@@ -132,7 +181,8 @@ function App() {
   function nextMove(){
     setGameMoves({
       ...gameMoves,
-      move: gameMoves.move + 1
+      move: gameMoves.move + 1,
+      turn: 1
     })
 
     setModalsControl({
@@ -140,7 +190,10 @@ function App() {
       MoveEnd: false
     })
 
-    setMapState({})
+    setMapState({
+      marker: [],
+      missingCity: []
+    })
   }
 
   function getHint(){
@@ -165,23 +218,24 @@ function App() {
         show={modalsControl.Intro} start_game={startGame} 
         onHide={() => setModalsControl({...modalsControl, Intro: false})}
       />
-      {gameMoves.movesStatistics.length === gameMoves.move &&
+      {modalsControl.MoveEnd &&
         <MoveEndModal 
-        show={modalsControl.MoveEnd} nextMove={nextMove}
+        show={modalsControl.MoveEnd} 
         onHide={nextMove}
-        success={gameMoves.movesStatistics[gameMoves.move - 1].success}
-        distance={gameMoves.movesStatistics[gameMoves.move - 1].distance}
-        points={gameMoves.movesStatistics[gameMoves.move - 1].points}
+        nextMove={nextMove}
+        success={gameMoves.movesStatistics.map(player => player[gameMoves.move - 1].success)}
+        points={gameMoves.movesStatistics.map(player => player[gameMoves.move - 1].points)}
+        distance={gameMoves.movesStatistics.map(player => player[gameMoves.move - 1].distance)}
       />
       } 
 
-      {gameMoves.move === 10 &&
+      {modalsControl.EndGame &&
         <EndGameModal 
-          correct={gameMoves.movesStatistics.reduce((count, move) => move.success ? count + 1 : count, 0)}
-          points={gameMoves.points}
-          newGame={endGame}
           show={modalsControl.EndGame}
           onHide={endGame}
+          newGame={endGame}
+          statistics={gameMoves.movesStatistics}
+          points={gameMoves.points}
         />
       }
       
@@ -189,11 +243,27 @@ function App() {
       {gameSettings.started && 
       <>
         <div className='missingCity'>
-            {cities.missing[gameMoves.move - 1].MGLSDE_LOC}
+            {cities.missing[gameMoves.turn - 1][gameMoves.move - 1].MGLSDE_LOC}
         </div>
         <div className='gameStatistics'>
+                {gameSettings.config.gameType > 1 &&<div className='turnDiv'>Turn: Player {gameMoves.turn}</div>}
                 <div className='movesDiv'>Moves: {gameMoves.move}/10</div>
-                <div className='pointsDiv'>Points: {gameMoves.points}</div>
+                <div className='pointsDiv'>
+                  {gameSettings.config.gameType[0] === 1 ?
+                    <div>Points: {gameMoves.points[0] ? gameMoves.points[0] : 0}</div>
+                    :
+                    <div>
+                      <h3>Points</h3>
+                      {
+                        gameMoves.points.map((player, index) => {
+                          return <div>
+                            Player {index + 1}: {player}
+                          </div>
+                        })
+                      }
+                    </div>
+                  }
+                </div>
         </div>
       </>
       }

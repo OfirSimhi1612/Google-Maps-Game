@@ -76,3 +76,8 @@
 .nextMoveButton{
     margin-top: 20px;
 }
+
+.playersStats{
+    display: flex;
+    flex-wrap: wrap;
+}
