@@ -108,10 +108,10 @@ function App() {
          {
             success: distance < 6 ? true : false,
             distance: distance.toFixed(2),
-            points: distance > 6 ? parseInt(100/distance) : 100
+            points: distance > 6 ? parseInt(106 - distance) : 100
          }
         ],
-        points: gameMoves.points + (distance > 6 ? parseInt(100/distance) : 100)
+        points: gameMoves.points + (distance > 6 ? parseInt(106 - distance) : 100)
       })
       
       if(gameMoves.move < 10){
