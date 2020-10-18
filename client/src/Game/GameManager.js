@@ -104,11 +104,11 @@ export async function getPolylinePath(origin, destination){
     const data = await fetch(url)
 
     const jData = await data.json()
-
+console.log(jData)
     if(jData.status === 'OK'){
 
         const polyPoints = jData.routes[0].legs[0].steps.map(step => getPolyPoints(step.polyline.points))
-        return polyPoints.flat()
+        return [polyPoints.flat(), jData.routes[0].legs[0].distance.value]
     } else {
 
         return 'error'

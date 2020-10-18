@@ -36,10 +36,12 @@ function MoveEndModal(props){
                             {
                                 props.points.map((points, index) => {
                                     return <>
+                                    <div>
                                     <h4>Player {index + 1}</h4>
                                         <div><b>{props.distance[index]} Km</b> from the correct point</div>
                                         <div><b>{points}</b> points gained!</div>
                                         <br></br>
+                                        </div>
                                     </>
                                 })
                             }

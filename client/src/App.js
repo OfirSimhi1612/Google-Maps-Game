@@ -124,6 +124,8 @@ function App() {
       lng: gameSettings.started ? cities.missing[player][move].X : null
     }
 
+    let distance = 0;
+
     if(gameSettings.config.gameType[0] === 'air'){
 
       setMapState({
@@ -146,8 +148,8 @@ function App() {
       }
       const polyline = [...mapState.polyline]
 
-      polyline.push(polyPath)
-
+      polyline.push(polyPath[0])
+      distance = parseInt(polyPath[1]/1000)
 
       setMapState({
         marker: markers,
@@ -159,8 +161,10 @@ function App() {
 
     if(gameSettings.started){
 
-      const distance = getAbsuluteDistance(event.latLng.lat(), event.latLng.lng(), cities.missing[player][move].Y, cities.missing[player][move].X )
-
+      if(gameSettings.config.gameType[0] === 'air'){
+        distance = getAbsuluteDistance(event.latLng.lat(), event.latLng.lng(), cities.missing[player][move].Y, cities.missing[player][move].X )
+      }
+      
       const statistics = [...gameMoves.movesStatistics]
       const points = [...gameMoves.points]
 
@@ -266,7 +270,6 @@ function App() {
           show={modalsControl.EndGame}
           onHide={endGame}
           newGame={endGame}
-          statistics={gameMoves.movesStatistics}
           points={gameMoves.points}
         />
       }
