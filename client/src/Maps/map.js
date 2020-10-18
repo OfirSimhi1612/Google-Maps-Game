@@ -114,7 +114,7 @@ function Map({mapState, config, handleMove, gameType}) {
           }
 
           {mapState.hint &&
-            <Circle radius={40000} center={mapState.hint}/>
+            <Circle radius={60000} center={mapState.hint}/>
           }
 
         </GoogleMap>

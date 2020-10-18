@@ -22,7 +22,7 @@ function App() {
         cities: ['large', 'Large Cities Only']
       }
   })
-  const [mapState, setMapState] = useState({zoom: 8, polyline: []})
+  const [mapState, setMapState] = useState({zoom: 8, polyline: [], marker: [], missingCity: []})
   const [cities, setCities] = useState({ all: [], missing: []})
   const [gameMoves, setGameMoves] = useState({movesStatistics: []})
 
@@ -103,7 +103,7 @@ function App() {
       }
     })
     setCities({})
-    setMapState({zoom: 8, polyline: []})
+    setMapState({zoom: 8, polyline: [], marker: [], missingCity: []})
   }
 
   async function handleMove(event){
