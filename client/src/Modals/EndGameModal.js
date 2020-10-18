@@ -5,6 +5,13 @@ import Button from 'react-bootstrap/Button'
 
 function MoveEndModal(props){
 
+    function getWinner(){
+
+        const maxPoints = Math.max(...props.points)
+        const winner = props.points.indexOf(maxPoints)
+
+        return winner + 1
+    }
 
     return(
         <>
@@ -20,10 +27,20 @@ function MoveEndModal(props){
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <div>You guessed <b>{props.correct}</b> correct locations out of 10,</div>
-                <div>and earned <b>{props.points}</b> points!</div>
-                {/* <SuccessChart></SuccessChart> */}
-                <div>Good Job!</div>
+                {props.points.length === 1 ? 
+                <>
+                    <div>You guessed <b>{props.correct}</b> correct locations out of 10,</div>
+                    <div>and earned <b>{props.points}</b> points!</div>
+                     <div>Good Job!</div>
+                </>
+                :
+                <div>
+                    <h3>The winner is Player {getWinner()}! </h3>
+                    <br></br>
+                    <h4>Good Game!</h4>
+                </div>
+                }
+                
                 <Button className='startGameInLevel' variant='outline-success' onClick={props.newGame}>New Game</Button>
             </Modal.Body>
         </Modal>

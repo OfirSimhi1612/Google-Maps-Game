@@ -10,7 +10,8 @@ import Dropdown from 'react-bootstrap/Dropdown'
 function IntroModal(props){
 
     const [config, setConfig] = useState({
-        gameType: [1, '1 Player'],
+        gameType: ['air', 'Air Distance'],
+        participants: [1, '1 Player'],
         mapType: ['roadmap', 'Road Map'],
         roads: [true, true, 'Roads and numbers'],
         cities: ['large', 'Large Cities Only']
@@ -40,16 +41,29 @@ function IntroModal(props){
                 <div className='mapConfig'>
                 <h3 className='configTitle'>Choose Game Configuration: </h3>
                 <div className='configKeyDiv'>
-                        <label className='gameTypeLabel'>Participants: </label>
+                        <label className='gameTypeLabel'>Game Type: </label>
                         <Dropdown className='dropDowns'>
                             <Dropdown.Toggle variant="outline-info" id="mapType-dropdown-basic">
                                 { config.gameType[1]}
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>
-                                <Dropdown.Item onSelect={() => updateConfig('gameType', [1, '1 Player'])}>1 Player</Dropdown.Item>
-                                <Dropdown.Item onSelect={() => updateConfig('gameType', [2, '2 Players'])}>2 Players</Dropdown.Item>
-                                <Dropdown.Item onSelect={() => updateConfig('gameType', [3, '3 Players'])}>3 Players</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('gameType', ['air', 'Air Distance'])}>Air Distance</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('gameType', ['drive', 'Driving Distance'])}>Driving Distance</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown >
+                    </div>
+                <div className='configKeyDiv'>
+                        <label className='participantsLabel'>Participants: </label>
+                        <Dropdown className='dropDowns'>
+                            <Dropdown.Toggle variant="outline-info" id="mapType-dropdown-basic">
+                                { config.participants[1]}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                <Dropdown.Item onSelect={() => updateConfig('participants', [1, '1 Player'])}>1 Player</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('participants', [2, '2 Players'])}>2 Players</Dropdown.Item>
+                                <Dropdown.Item onSelect={() => updateConfig('participants', [3, '3 Players'])}>3 Players</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown >
                     </div>

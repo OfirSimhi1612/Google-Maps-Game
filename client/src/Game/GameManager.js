@@ -45,16 +45,13 @@ export function getAbsuluteDistance(lat1,lon1,lat2,lon2) {
     var d = R * c; // Distance in km
     return d;
 }
-  
-//  function getWalkingDistance(lat1,lon1,lat2,lon2){
 
-//  }
-
+    
 export function getHintCordinates(lat, lng){
-
+    
     const yDiff = Math.random() / 3 * (Math.random() > 0.5 ? -1 : 1)
     const xDiff = Math.random() / 3 * (Math.random() > 0.5 ? -1 : 1)
-    
+
     return {
         lat: lat + yDiff,
         lng: lng + xDiff
@@ -62,16 +59,61 @@ export function getHintCordinates(lat, lng){
     
 }
 
-export function getWalkingDistance(origin, destination){
+function getPolyPoints(encoded){
+    let points = [];
+    let index = 0,
+        len = encoded.length;
+    let lat = 0,
+        lng = 0;
+    while (index < len) {
+        let b,
+        shift = 0,
+        result = 0;
+        do {
+        b = encoded.charAt(index++).charCodeAt(0) - 63; //finds ascii
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+        } while (b >= 0x20);
+        let dlat = (result & 1) !== 0 ? ~(result >> 1) : result >> 1;
+        lat += dlat;
+        shift = 0;
+        result = 0;
+        do {
+        b = encoded.charAt(index++).charCodeAt(0) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+        } while (b >= 0x20);
+        let dlng = (result & 1) !== 0 ? ~(result >> 1) : result >> 1;
+        lng += dlng;
+
+        points.push({ lat: lat / 1e5, lng: lng / 1e5 });
+    }
+    return points;
+}
+
+export async function getPolylinePath(origin, destination){
 
     const url = new URL('https://maps.googleapis.com/maps/api/directions/json')
     url.search = new URLSearchParams({
-        origin: '31.857700045996,34.8370833334332',
-        destination: '31.9632730962419,34.9137746940875',
+        origin: `${origin.lat},${origin.lng}`,
+        destination: `${destination.lat},${destination.lng}`,
         key: 'AIzaSyBeOBTkKGGeblhp3ie0RmdDDI6uHduVYVw',
         mode: 'walking'
     })
  
-    fetch(url).then(res => res.json()).then(res => console.log(res))
+    const data = await fetch(url)
+
+    const jData = await data.json()
+console.log(jData)
+    if(jData.status === 'OK'){
+
+        const polyPoints = jData.routes[0].legs[0].steps.map(step => getPolyPoints(step.polyline.points))
+        return [polyPoints.flat(), jData.routes[0].legs[0].distance.value]
+    } else {
+
+        return 'error'
+    }
+
+   
 
 }
