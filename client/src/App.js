@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import './App.css';
 import Map from './Maps/Map'
 import IntroModal from './Modals/IntroModal'
-import { getCities, getRandomCity, getAbsuluteDistance, getHintCordinates, getPolylinePath } from './Game/GameManager'
+import { getCities, getRandomCity, getAbsuluteDistance, getHintCordinates, getPolylinePath } from './Game/helpres'
 import MoveEndModal from './Modals/MoveEndModal';
 import EndGameModal from './Modals/EndGameModal'
 import swal from 'sweetalert'
@@ -113,6 +113,10 @@ function App() {
 
     const markers = [...mapState.marker] 
     const missing = [...mapState.missingCity]
+
+    if(markers.length === gameSettings.config.participants[0]){
+      return
+    }
 
     markers[player] = {
       lat: event.latLng.lat(),

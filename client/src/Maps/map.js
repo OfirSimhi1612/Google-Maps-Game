@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { GoogleMap, LoadScript, Marker, Circle, DirectionsRenderer, DirectionsService, Polyline } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Circle } from '@react-google-maps/api';
 import './map.css'
 import mapConfig from '../Configs/MapConfig'
 import _Marker from './Marker'
@@ -7,63 +7,19 @@ import _Circle from './Circle'
 import _Polyline from './Polyline'
 
 
-function Map({mapState, config, handleMove, gameType}) {
+function Map({mapState, config, handleMove}) {
 
   const [center, setCenter] = useState()
-  // const [polylines, setPolylines] = useState([])
-
-  // useEffect(() => {
-    
-  //   async function getPoly(){
-       
-  //     const lines = []
-  //     mapState.marker.map(async (player, index) => {
-
-  //       const polyPath = await getPolylinePath(player, mapState.missingCity[index])
-  //       lines.push(polyPath)
-  //     }) 
-
-  //     setPolylines(lines)
-  //   }
-  //   if(mapState.marker && mapState.missingCity && gameType === 'drive'){
-  //     getPoly()
-  //   } else {
-  //     if(polylines.llength > 0){
-  //       setPolylines([])
-  //     } else {
-  //       return
-  //     }
-  //   }
-  // }, [mapState])
-
-  // function getDirections(response){
-  //   if (response !== null) {
-  //     if (response.status === 'OK') {
-  //       const polyPoints = response.routes[0].legs[0].steps.map(step => PolylinePoints(step.polyline.points))
-  //       setPolylines([
-  //         ...polylines,
-  //         polyPoints.flat()
-  //       ])
-  //     } else {
-  //       console.log('response: ', response)
-  //     }
-  //   }
-  // }
-
-
+  
   const map = useRef()
 
-  const mapStyles = {        
-    height: "100vh",
-    width: "100%"
-  }
-
+  
   useEffect(() => {
     if(map.current){
       map.current.state.map.mapTypeId = config.mapType[0]
     }
   }, [config])
-
+  
   function changeCenter(){
     if(map.current){
       setCenter({
@@ -73,17 +29,22 @@ function Map({mapState, config, handleMove, gameType}) {
     }	
     
   }
-
+  
   const options = {
     styles: mapConfig(config),
     disableDefaultUI: true,
     zoomControl: true,           
   }
   
+  const mapStyles = {        
+    height: "100vh",
+    width: "100%"
+  }
+  
   return (
-     <LoadScript
-       googleMapsApiKey='AIzaSyBeOBTkKGGeblhp3ie0RmdDDI6uHduVYVw' 
-       >
+    <LoadScript
+    googleMapsApiKey='AIzaSyBeOBTkKGGeblhp3ie0RmdDDI6uHduVYVw' 
+    >
         <GoogleMap
           ref={map}
           mapContainerStyle={mapStyles}
@@ -93,14 +54,14 @@ function Map({mapState, config, handleMove, gameType}) {
           onClick={handleMove}
           onDragEnd={changeCenter}
           onZoomChanged={changeCenter}
-        >
-          {(mapState.marker) &&
+          >
+          {mapState.marker &&
             mapState.marker.map((marker, index) => {
               return <_Marker marker={marker} index={index}/>
             })
           }
 
-          {(mapState.missingCity) &&
+          {mapState.missingCity &&
           mapState.missingCity.map((circle, index) => {
             return <_Circle circle={circle} index={index} />
           })
