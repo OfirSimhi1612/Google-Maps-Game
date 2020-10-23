@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
 import Button from 'react-bootstrap/Button';
 import './App.css';
 import Map from './Maps/Map'
